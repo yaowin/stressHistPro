@@ -173,7 +173,9 @@ def save_StressHistories(parasetting, processCount):
 
 #%% Calculate the Titanium Fatigue
 def calc_TiFatigue(cyc, snstr, t, scf, rt = False):
-
+    
+    unit_c = 0.14504   # convert MPa to ksi
+    
     try:    
         if snstr == 'RTI R-ratio':
             sig_f = 0.00008356*t**2 - 0.1337*t + 182.59
@@ -183,9 +185,9 @@ def calc_TiFatigue(cyc, snstr, t, scf, rt = False):
             R_wavg = np.sum(cyc['R_xcyc'])/np.sum(cyc['cyc'])
             ## calculate cycles to failure based on individual R ratio
             if rt:
-                N = A*(np.sqrt(2/(1-cyc['R']))*scf*cyc['cyc'])**n
+                N = A*(np.sqrt(2/(1-cyc['R']))*scf*cyc['cyc']*unit_c)**n
             else:
-                N = A*(scf*cyc['cyc'])**n
+                N = A*(scf*cyc['cyc']*unit_c)**n
             ## calculate cycles to failure based on weighted average R ratio
             #N = A*(np.sqrt(2/(1-R_wavg))*scf*cyc['cyc'])**n
         if snstr == 'RTI 1G':
@@ -325,11 +327,18 @@ def Usage():
     errorString = """
 The expected command line for this script has the form:
 
-    >> python StressHistPro.py <input excel file> [number of parallel processes]
+    >> python StressHistPro.py <input excel file> [number of stage processes]
 
-The parallel process count is optional.
+The stage process number is optional, default = 3
+
+Stage 0: fetch input parameters from input excel
+Stage 1: Stress History Extraction and Storage to *.CSV file
+Stage 2: Run rainflow halfcount, stress histogram, and fatigue damage calc.
+[number of stage processes] is the sum of your desired stage numbers to run. e.g. 3 is running all stages
+
 All input parameters are controled in the input excel file.
 All output folders will be created inside the working folder.
+
 """
     print errorString
 	
@@ -341,9 +350,9 @@ if __name__=="__main__":
     try:
         inputFile = sys.argv[1]
         try:
-            processCount = int(sys.argv[2])
+            processStage = int(sys.argv[2])
         except IndexError:
-            processCount = 8
+            processStage = 3
     except:
         Usage()
         exit()
@@ -352,11 +361,14 @@ if __name__=="__main__":
     print '*** Stage 0: Input Parameters reading...'	
     para = get_ParameterInput(inputFile)
     print 'Completed.'
-
-    print '*** Stage 1: Stress History Calculation and Storage begins...'	
-    [simhr, maxs, mins] = save_StressHistories(para, processCount)
-    print 'All Stress Time History Data: hours in 1 simulation = {0:.1f}, max stress = {1:.1f} MPa, min stress = {2:.1f} MPa'.format(simhr, maxs, mins)
-
+    
+    if processStage in [1, 3]:
+        print '*** Stage 1: Stress History Calculation and Storage begins...'	
+        [simhr, maxs, mins] = save_StressHistories(para, 8)
+        print 'All Stress Time History Data: hours in 1 simulation = {0:.1f}, max stress = {1:.1f} MPa, min stress = {2:.1f} MPa'.format(simhr, maxs, mins)
+        if processStage == 1:
+            quit()
+    
     print '*** Stage 2: Stress Histogram Generation begins...'	
 
     debug_dir ="\\".join((para['path'], 'Stress Histograms', 'debug log'))
@@ -416,8 +428,8 @@ if __name__=="__main__":
                     #stressHistory = history_data[:, col + 1] * para['unit']
                     stressHistory = history_data[:, col + 1]
                     # load stress time trace into rainflow half counts 
-                    #cycrange = get_Rainflow(stressHistory, para['residual'][arcind+1])
-                    cycrange = get_Rainflow(stressHistory)
+                    cycrange = get_Rainflow(stressHistory, para['residual'][arcind+1])
+                    #cycrange = get_Rainflow(stressHistory)
 
                     # calculate the fatigue damage
                     if para['matstr'][arcind+1] == 'Titanium':
