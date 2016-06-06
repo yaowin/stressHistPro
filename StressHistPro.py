@@ -334,7 +334,8 @@ The stage process number is optional, default = 3
 Stage 0: fetch input parameters from input excel
 Stage 1: Stress History Extraction and Storage to *.CSV file
 Stage 2: Run rainflow halfcount, stress histogram, and fatigue damage calc.
-[number of stage processes] is the sum of your desired stage numbers to run. e.g. 3 is running all stages
+[number of stage processes] is the sum of your desired stage numbers to run. e.g. 3 is to run all stages;
+2 is to run stage 2 only, 1 is to run stage 1 only. 
 
 All input parameters are controled in the input excel file.
 All output folders will be created inside the working folder.
@@ -353,10 +354,12 @@ if __name__=="__main__":
             processStage = int(sys.argv[2])
         except IndexError:
             processStage = 3
+        except processStage > 3:
+			Usage()
+			exit()
     except:
         Usage()
         exit()
-    
     
     print '*** Stage 0: Input Parameters reading...'	
     para = get_ParameterInput(inputFile)
@@ -368,7 +371,10 @@ if __name__=="__main__":
         print 'All Stress Time History Data: hours in 1 simulation = {0:.1f}, max stress = {1:.1f} MPa, min stress = {2:.1f} MPa'.format(simhr, maxs, mins)
         if processStage == 1:
             exit()
-    
+    if processStage in [2,]:
+         simhr = 3
+         print 'Stage 1 is skipped. Simulation duration is pre-defined as: {0:1d}'.format(simhr)
+
     print '*** Stage 2: Stress Histogram Generation begins...'	
 
     debug_dir ="\\".join((para['path'], 'Stress Histograms', 'debug log'))
