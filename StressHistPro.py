@@ -372,8 +372,8 @@ if __name__=="__main__":
         if processStage == 1:
             exit()
     if processStage in [2,]:
-         simhr = 3
-         print 'Stage 1 is skipped. Simulation duration is pre-defined as: {0:1d}'.format(simhr)
+         simhr = 3.0
+         print 'Stage 1 is skipped. Simulation duration is pre-defined as: {0:.1f} hours'.format(simhr)
 
     print '*** Stage 2: Stress Histogram Generation begins...'	
 
