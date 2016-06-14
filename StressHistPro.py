@@ -154,7 +154,7 @@ def save_StressHistories(parasetting, processCount):
                 mins = np.amin(stressHist)
                 max_s = max(max_s, maxs)
                 min_s = min(min_s, mins)
-                subfoldpath = parasetting['path'] +'\\Stress Histograms' + '\\arcLen ' + str(int(np.rint(arcl))) + 'm' + parasetting['radstr'][rpind+1]
+                subfoldpath = parasetting['path'] +'\\Stress Histories' + '\\arcLen ' + '{0:.1f}'.format(arcl) + 'm_' + parasetting['radstr'][rpind+1]
                 if not os.path.exists(subfoldpath):
                     os.makedirs(subfoldpath)
                 textFstr = os.path.join(subfoldpath, waveid + '.csv')
@@ -377,7 +377,7 @@ if __name__=="__main__":
 
     print '*** Stage 2: Stress Histogram Generation begins...'	
 
-    debug_dir ="\\".join((para['path'], 'Stress Histograms', 'debug log'))
+    debug_dir ="\\".join((para['path'], 'Stress Histories', 'debug log'))
     if not os.path.exists(debug_dir):
         os.makedirs(debug_dir)    
     sBins = para['HistBins']['Histogram Bins (Mpa)']
@@ -396,7 +396,7 @@ if __name__=="__main__":
         arcind = np.nonzero(para['arclength'] == arcl)[0][0]
         start = time.clock()
         i_col = 4
-        worksheet = workbook.add_worksheet(" ".join(('ArcLen=',str(int(np.rint(arcl))), 'm')))
+        worksheet = workbook.add_worksheet(" ".join(('ArcLen=','{0:.1f}'.format(arcl), 'm')))
         worksheet.set_column('A:D', 15)
         worksheet.write('D1', 'from hang-off', bold)
         worksheet.write('D2', 'Angular Position', bold)
@@ -407,7 +407,7 @@ if __name__=="__main__":
 
         for rp in (para['radval']):    #step through radial position
             rpind = para['radval'].index(rp)
-            cdir = "\\".join((para['path'], 'Stress Histograms', 'arcLen ' + str(int(np.rint(arcl))) + 'm' + para['radstr'][rpind+1]))
+            cdir = "\\".join((para['path'], 'Stress Histories', 'arcLen ' + '{0:.1f}'.format(arcl) + 'm_' + para['radstr'][rpind+1]))
             
             fl = [os.path.join(dirpath, f)
                 for dirpath, dirnames, files in os.walk(cdir)
