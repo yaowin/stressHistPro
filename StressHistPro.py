@@ -368,7 +368,7 @@ if __name__=="__main__":
     if processStage in [1, 3]:
         print '*** Stage 1: Stress History Calculation and Storage begins...'	
         [simhr, maxs, mins] = save_StressHistories(para, 8)
-        print 'All Stress Time History Data: hours in 1 simulation = {0:.1f}, max stress = {1:.1f} MPa, min stress = {2:.1f} MPa'.format(simhr, maxs, mins)
+        print 'All Stress Time History Data: each simulation has {0:.1f} hours, max stress = {1:.1f} MPa, min stress = {2:.1f} MPa'.format(simhr, maxs, mins)
         if processStage == 1:
             exit()
     if processStage in [2,]:
